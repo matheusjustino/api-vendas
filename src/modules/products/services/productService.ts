@@ -16,18 +16,7 @@ class ProductService {
 
 	constructor() {
 		this.productsRepository = getCustomRepository(ProductRepository);
-		// this.getProductsRepository();
 	}
-
-	private getProductsRepository(): ProductRepository {
-		if (!this.productsRepository) {
-			this.productsRepository = getCustomRepository(ProductRepository);
-			return this.productsRepository;
-		} else {
-			return this.productsRepository;
-		}
-	}
-
 	public async createProduct({
 		name,
 		price,

@@ -11,7 +11,7 @@ class Product {
 	@PrimaryGeneratedColumn('uuid')
 	public id: string;
 
-	@Column()
+	@Column({ type: String })
 	public name: string;
 
 	@Column('decimal')
@@ -20,10 +20,10 @@ class Product {
 	@Column('int')
 	public quantity: number;
 
-	@CreateDateColumn()
+	@CreateDateColumn({ type: Date })
 	public created_at: Date;
 
-	@UpdateDateColumn()
+	@UpdateDateColumn({ type: Date })
 	public updated_at: Date;
 }
 

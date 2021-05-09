@@ -1,8 +1,6 @@
-import AppError from '@shared/errors/AppError';
 import { EntityRepository, getRepository, Repository } from 'typeorm';
 import Product from '../entities/product.entity';
 
-console.log('repository');
 @EntityRepository(Product)
 class ProductRepository extends Repository<Product> {
 	private readonly productRepository: Repository<Product>;
