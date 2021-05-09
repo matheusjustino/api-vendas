@@ -1,0 +1,16 @@
+.idea/
+.vscode/
+node_modules/
+build/
+temp/
+.env
+coverage
+ormconfig.json
+dist
+
+# Envs
+src/environments/develop.env
+src/environments/production.env
+
+uploads/*
+!uploads/.gitkeep
