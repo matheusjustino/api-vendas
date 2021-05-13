@@ -1,5 +1,6 @@
 import { getCustomRepository } from 'typeorm';
 import { isAfter, addHours } from 'date-fns';
+import path from 'path';
 import { hash } from 'bcryptjs';
 import UserRepository from '../typeorm/repositories/userRepository';
 import UserTokensRepository from '../typeorm/repositories/userTokensRepository';
@@ -33,6 +34,17 @@ class TokenService {
 			throw new AppError('Error trying to generate user token');
 		}
 
+		const forgotPasswordTemplate = path.resolve(
+			__dirname,
+			'..',
+			'..',
+			'..',
+			'config',
+			'mail',
+			'views',
+			'forgot_password.hbs',
+		);
+
 		await EtherealMail.sendEmail({
 			to: {
 				name: userExists.name,
@@ -40,10 +52,10 @@ class TokenService {
 			},
 			subject: '[API VENDAS] Recuperação de Email',
 			templateData: {
-				template: `Olá {{name}}: {{token}}`,
+				file: forgotPasswordTemplate,
 				variables: {
 					name: userExists.name,
-					token: token.token,
+					link: `http://localhost:3000/reset_password?token=${token.token}`,
 				},
 			},
 		});

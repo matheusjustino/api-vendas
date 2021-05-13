@@ -1,6 +1,6 @@
 import TemplateVariable from './templateVariable';
 
 export default interface ParserMailTemplate {
-	template: string;
+	file: string;
 	variables: TemplateVariable;
 }
