@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
+
+// DTO'S
 import CreateUserDto from '../dtos/createUserDto';
 import UpdateUserAvatarDto from '../dtos/updateUserAvatarDto';
+import UpdateUserDto from '../dtos/updateUserDto';
+
+// SERVICES
 import UserService from '../services/userService';
 
 class UserController {
@@ -62,6 +67,24 @@ class UserController {
 			return response.json(user);
 		} catch (error) {
 			return response.json(error);
+		}
+	}
+
+	public async updateUser(request: Request, response: Response) {
+		try {
+			const { id } = request.params;
+			const updateUserDto: UpdateUserDto = request.body;
+
+			const userService = new UserService();
+
+			const updatedUser = await userService.updateUser(id, updateUserDto);
+
+			return response.json(updatedUser);
+		} catch (error) {
+			return response.json({
+				message: error.message,
+				details: error.detail,
+			});
 		}
 	}
 }

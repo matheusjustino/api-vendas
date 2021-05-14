@@ -27,13 +27,47 @@ userRouter.post(
 	}),
 	userController.createUser,
 );
+
+userRouter.put(
+	'/:id',
+	celebrate({
+		[Segments.PARAMS]: {
+			id: Joi.string().uuid().required(),
+		},
+		[Segments.BODY]: {
+			name: Joi.string(),
+			email: Joi.string().email(),
+			oldPassword: Joi.string(),
+			password: Joi.string().optional(),
+			passwordConfirmation: Joi.string()
+				.valid(Joi.ref('password'))
+				.when('password', {
+					is: Joi.exist(),
+					then: Joi.required(),
+				}),
+		},
+	}),
+	isAuthenticated,
+	userController.updateUser,
+);
+
 userRouter.patch(
 	'/avatar',
 	isAuthenticated,
 	multerUpload.single('avatar'),
 	userController.updateUserAvatar,
 );
+
 userRouter.get('/', isAuthenticated, userController.findAllUsers);
-userRouter.get('/:id', isAuthenticated, userController.findUserById);
+userRouter.get(
+	'/:id',
+	isAuthenticated,
+	celebrate({
+		[Segments.PARAMS]: {
+			id: Joi.string().uuid().required(),
+		},
+	}),
+	userController.findUserById,
+);
 
 export default userRouter;

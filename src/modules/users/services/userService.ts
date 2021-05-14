@@ -1,6 +1,6 @@
 import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
-import { hash } from 'bcryptjs';
+import { hash, compare } from 'bcryptjs';
 import path from 'path';
 import fs from 'fs';
 
@@ -12,6 +12,7 @@ import UserRepository from '../typeorm/repositories/userRepository';
 // DTO's
 import UpdateUserAvatarDto from '../dtos/updateUserAvatarDto';
 import CreateUserDto from '../dtos/createUserDto';
+import UpdateUserDto from '../dtos/updateUserDto';
 
 // ENTITIES
 import User from '../typeorm/entities/user.entity';
@@ -31,10 +32,10 @@ class UserService {
 			avatar: createUserDto.avatar,
 		};
 
-		const userEntity = await this.userRepository.create(createUserData);
-		const user = await this.userRepository.save(userEntity);
+		const userEntity = this.userRepository.create(createUserData);
+		await this.userRepository.save(userEntity);
 
-		return user;
+		return userEntity;
 	}
 
 	public async findAllUsers(): Promise<User[]> {
@@ -84,6 +85,43 @@ class UserService {
 		await this.userRepository.save(user);
 
 		return user;
+	}
+
+	public async updateUser(
+		userId: string,
+		updateUserDto: UpdateUserDto,
+	): Promise<User> {
+		const user = await this.userRepository.findById(userId);
+
+		if (!user) {
+			throw new AppError('User not found');
+		}
+
+		if (updateUserDto.password && !updateUserDto.oldPassword) {
+			throw new AppError('Old password is required to update password');
+		}
+
+		if (updateUserDto.password && updateUserDto.oldPassword) {
+			const checkOldPassword = await compare(
+				updateUserDto.oldPassword,
+				user.password,
+			);
+
+			if (!checkOldPassword) {
+				throw new AppError('Old password does not match');
+			}
+
+			updateUserDto.password = await hash(updateUserDto.password, 10);
+		}
+
+		const updatedUserEntity = this.userRepository.create({
+			...user,
+			...updateUserDto,
+		});
+
+		const updatedUser = await this.userRepository.save(updatedUserEntity);
+
+		return updatedUser;
 	}
 
 	private async encryptPassword(password: string): Promise<string> {
