@@ -14,6 +14,7 @@ declare namespace NodeJS {
 			S3_REGION: string;
 			S3_ACCESS_KEY: string;
 			S3_PRIVATE_KEY: string;
+			STORAGE_DRIVER: string;
 		};
 	}
 }

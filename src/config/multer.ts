@@ -8,11 +8,6 @@ interface UploadConfig {
 	multer: {
 		storage: StorageEngine;
 	};
-	config: {
-		aws: {
-			bucket: string;
-		};
-	};
 }
 
 const uploadFolderPath = path.resolve(__dirname, '..', '..', 'uploads');
@@ -31,10 +26,5 @@ export default {
 				callback(null, filename);
 			},
 		}),
-	},
-	config: {
-		aws: {
-			bucket: process.env.S3_BUCKET,
-		},
 	},
 } as UploadConfig;

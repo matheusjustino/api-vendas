@@ -5,7 +5,7 @@ class StorageProvider {
 	private storageProvider: DiskStorageProvider | S3StorageProvider;
 
 	public get getStorageProvider(): DiskStorageProvider | S3StorageProvider {
-		if (process.env.NODE_ENV === 'production') {
+		if (process.env.STORAGE_DRIVER === 's3') {
 			if (this.storageProvider) {
 				return this.storageProvider;
 			} else {
