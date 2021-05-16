@@ -19,6 +19,18 @@ class OrderController {
 		}
 	}
 
+	public async findAllOrders(request: Request, response: Response) {
+		try {
+			const orderService = new OrderService();
+
+			const orders = await orderService.findAllOrders();
+
+			return response.json(orders);
+		} catch (error) {
+			return response.json(error);
+		}
+	}
+
 	public async findOrderById(request: Request, response: Response) {
 		try {
 			const orderService = new OrderService();

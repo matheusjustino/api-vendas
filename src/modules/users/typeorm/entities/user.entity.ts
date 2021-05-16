@@ -5,6 +5,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+import { Exclude, Expose } from 'class-transformer';
 
 @Entity('users')
 class User {
@@ -17,7 +18,8 @@ class User {
 	@Column({ type: String, unique: true })
 	public email: string;
 
-	@Column({ type: String, select: false })
+	@Column({ type: String })
+	@Exclude()
 	public password: string;
 
 	@Column({ type: String, nullable: true })
@@ -28,6 +30,15 @@ class User {
 
 	@UpdateDateColumn({ type: Date })
 	public updated_at: Date;
+
+	@Expose({ name: 'avatar_url' })
+	public getAvatarUrl(): string | null {
+		if (!this.avatar) {
+			return null;
+		} else {
+			return `${process.env.APP_API_URL}/files/${this.avatar}`;
+		}
+	}
 }
 
 export default User;

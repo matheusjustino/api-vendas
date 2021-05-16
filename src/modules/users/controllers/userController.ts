@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { classToClass } from 'class-transformer';
 
 // DTO'S
 import CreateUserDto from '../dtos/createUserDto';
@@ -16,7 +17,7 @@ class UserController {
 
 			const user = await userService.createUser(createUserDto);
 
-			return response.json(user);
+			return response.json(classToClass(user));
 		} catch (error) {
 			return response.json({
 				message: error.message,
@@ -31,7 +32,7 @@ class UserController {
 
 			const users = await userService.findAllUsers();
 
-			return response.json(users);
+			return response.json(classToClass(users));
 		} catch (error) {
 			return response.json(error);
 		}
@@ -45,7 +46,7 @@ class UserController {
 
 			const user = await userService.findUserById(id);
 
-			return response.json(user);
+			return response.json(classToClass(user));
 		} catch (error) {
 			return response.json(error);
 		}
@@ -64,7 +65,7 @@ class UserController {
 				updateUserAvatarDto,
 			);
 
-			return response.json(user);
+			return response.json(classToClass(user));
 		} catch (error) {
 			return response.json(error);
 		}
@@ -79,7 +80,7 @@ class UserController {
 
 			const updatedUser = await userService.updateUser(id, updateUserDto);
 
-			return response.json(updatedUser);
+			return response.json(classToClass(updatedUser));
 		} catch (error) {
 			return response.json({
 				message: error.message,

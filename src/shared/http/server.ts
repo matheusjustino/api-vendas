@@ -4,11 +4,13 @@ require('dotenv').config({ path: configOptions.envFilePath });
 import express, { NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
 import { errors } from 'celebrate';
+import { pagination } from 'typeorm-pagination';
 import { createConnection } from 'typeorm';
 import cors from 'cors';
 import routes from './routes';
 import AppError from '@shared/errors/AppError';
 import multerConfig from '@config/multer';
+import rateLimiter from '@shared/http/middlewares/rateLimiter';
 
 async function main() {
 	const connection = await createConnection();
@@ -20,6 +22,8 @@ async function main() {
 
 		app.use(cors());
 		app.use(express.json());
+		app.use(rateLimiter);
+		app.use(pagination);
 		app.use('/files', express.static(multerConfig.directory));
 		app.use(routes);
 		app.use(errors());

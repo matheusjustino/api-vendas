@@ -3,6 +3,7 @@ import authConfig from '@config/auth';
 import { sign } from 'jsonwebtoken';
 import { compare } from 'bcryptjs';
 import { getCustomRepository } from 'typeorm';
+import { classToClass } from 'class-transformer';
 import CreateSessionResponseInterface from '../interfaces/createSessionResponseInterface';
 import UserRepository from '../typeorm/repositories/userRepository';
 import CreateSessionDto from '../dtos/createSessionDto';
@@ -45,6 +46,8 @@ class SessionService {
 			user,
 			token,
 		};
+
+		response.user = classToClass(response.user);
 
 		return response;
 	}

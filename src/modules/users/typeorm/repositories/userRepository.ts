@@ -17,15 +17,6 @@ class UserRepository extends Repository<User> {
 			where: {
 				name,
 			},
-			select: [
-				'id',
-				'name',
-				'email',
-				'password',
-				'avatar',
-				'created_at',
-				'updated_at',
-			],
 		});
 
 		return user;
@@ -36,15 +27,6 @@ class UserRepository extends Repository<User> {
 			where: {
 				id: userId,
 			},
-			select: [
-				'id',
-				'name',
-				'email',
-				'password',
-				'avatar',
-				'created_at',
-				'updated_at',
-			],
 		});
 
 		return user;
@@ -55,15 +37,6 @@ class UserRepository extends Repository<User> {
 			where: {
 				email,
 			},
-			select: [
-				'id',
-				'name',
-				'email',
-				'password',
-				'avatar',
-				'created_at',
-				'updated_at',
-			],
 		});
 
 		return user;

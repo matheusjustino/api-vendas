@@ -1,5 +1,6 @@
 import { getCustomRepository } from 'typeorm';
 import AppError from '@shared/errors/AppError';
+import RedisCache from '@shared/cache/redisCache';
 
 // DTO's
 import CreateProductDto from '../dtos/createProductDto';
@@ -11,11 +12,16 @@ import ProductRepository from '../typeorm/repositories/productsRepository';
 // ENTITIES
 import Product from '../typeorm/entities/product.entity';
 
+// INTERFACES
+import ProductPaginate from '../interfaces/productPaginate';
+
 class ProductService {
 	private productsRepository: ProductRepository;
+	private redisCache: RedisCache;
 
 	constructor() {
 		this.productsRepository = getCustomRepository(ProductRepository);
+		this.redisCache = new RedisCache();
 	}
 	public async createProduct({
 		name,
@@ -34,13 +40,24 @@ class ProductService {
 			quantity,
 		});
 
+		// invalidando cache antes adicionar novos produtos ao banco
+		await this.redisCache.invalidate('api-vendas-PRODUCT_LIST');
+
 		await this.productsRepository.save(product);
 
 		return product;
 	}
 
 	public async findAllProducts(): Promise<Product[]> {
-		const products = await this.productsRepository.find();
+		let products = await this.redisCache.recover<Product[]>(
+			'api-vendas-PRODUCT_LIST',
+		);
+
+		if (!products) {
+			products = await this.productsRepository.find();
+
+			await this.redisCache.save('api-vendas-PRODUCT_LIST', products);
+		}
 
 		return products;
 	}
@@ -77,6 +94,9 @@ class ProductService {
 			}
 		}
 
+		// invalidando cache antes atualizar um produto do banco
+		await this.redisCache.invalidate('api-vendas-PRODUCT_LIST');
+
 		const updatedProduct = await this.productsRepository.save({
 			...product,
 			...updateProductDto,
@@ -91,6 +111,9 @@ class ProductService {
 		if (!product) {
 			throw new AppError('Product not found');
 		}
+
+		// invalidando cache antes remover um produto do banco
+		await this.redisCache.invalidate('api-vendas-PRODUCT_LIST');
 
 		const productRemoved = await this.productsRepository.remove(product);
 

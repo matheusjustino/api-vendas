@@ -17,6 +17,9 @@ import UpdateUserDto from '../dtos/updateUserDto';
 // ENTITIES
 import User from '../typeorm/entities/user.entity';
 
+// INTERFACES
+import UserPaginate from '../interfaces/userPaginate';
+
 class UserService {
 	private userRepository: UserRepository;
 
@@ -38,10 +41,10 @@ class UserService {
 		return userEntity;
 	}
 
-	public async findAllUsers(): Promise<User[]> {
-		const users = await this.userRepository.find();
+	public async findAllUsers(): Promise<UserPaginate> {
+		const users = await this.userRepository.createQueryBuilder().paginate();
 
-		return users;
+		return users as UserPaginate;
 	}
 
 	public async findUserById(userId: string): Promise<User> {

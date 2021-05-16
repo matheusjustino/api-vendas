@@ -11,6 +11,9 @@ import Customer from '../typeorm/entities/customer.entity';
 import CreateCustomerDto from '../dtos/createCustomerDto';
 import UpdateCustomerDto from '../dtos/updateCustomerDto';
 
+// INTERFACES
+import CustomerPaginate from '../interfaces/customerPaginate';
+
 class CustomerService {
 	private customerRepository: CustomerRepository;
 
@@ -30,10 +33,12 @@ class CustomerService {
 		return customerEntity;
 	}
 
-	public async findAllCustomers(): Promise<Customer[]> {
-		const customers = await this.customerRepository.find();
+	public async findAllCustomers(): Promise<CustomerPaginate> {
+		const customers = await this.customerRepository
+			.createQueryBuilder()
+			.paginate();
 
-		return customers;
+		return customers as CustomerPaginate;
 	}
 
 	public async findById(customerId: string): Promise<Customer> {

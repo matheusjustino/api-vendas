@@ -9,6 +9,9 @@ import ProductRepository from '@modules/products/typeorm/repositories/productsRe
 // DTO'S
 import CreateOrderDto from '../dtos/createOrderDto';
 
+// INTERFACES
+import OrderPaginate from '../interfaces/orderPaginate';
+
 class OrderService {
 	private ordersRepository: OrdersRepository;
 	private customerRepository: CustomerRepository;
@@ -95,6 +98,14 @@ class OrderService {
 		await this.productRepository.save(updatedProductQuantity);
 
 		return order;
+	}
+
+	public async findAllOrders() {
+		const orders = await this.ordersRepository
+			.createQueryBuilder()
+			.paginate();
+
+		return orders as OrderPaginate;
 	}
 
 	public async findOrderById(orderId: string) {

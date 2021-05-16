@@ -5,6 +5,11 @@ declare namespace NodeJS {
 			EXPIRES_IN: string;
 			PORT: number;
 			NODE_ENV: string;
+			APP_EMAIL_URL: string;
+			APP_API_URL: string;
+			REDIS_HOST: string;
+			REDIS_PORT: string;
+			REDIS_PASS: string;
 		};
 	}
 }
