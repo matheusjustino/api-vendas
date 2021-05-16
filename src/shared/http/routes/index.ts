@@ -6,6 +6,7 @@ import userRouter from '@modules/users/routes/userRoutes';
 import sessionRouter from '@modules/users/routes/sessionRoutes';
 import passwordRouter from '@modules/users/routes/passwordRoutes';
 import customerRouter from '@modules/customers/routes/customerRoutes';
+import orderRouter from '@modules/orders/routes/orderRoutes';
 
 // MIDDLEWARES
 import isAuthenticated from '@shared/http/middlewares/isAuthenticated';
@@ -17,5 +18,6 @@ routes.use('/users', userRouter);
 routes.use('/sessions', sessionRouter);
 routes.use('/password', passwordRouter);
 routes.use('/customers', isAuthenticated, customerRouter);
+routes.use('/orders', isAuthenticated, orderRouter);
 
 export default routes;

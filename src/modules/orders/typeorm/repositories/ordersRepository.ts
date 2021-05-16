@@ -1,3 +1,4 @@
+import Customer from '@modules/customers/typeorm/entities/customer.entity';
 import { EntityRepository, getRepository, Repository } from 'typeorm';
 
 // DTO'S
@@ -5,6 +6,15 @@ import CreateOrderDto from '../../dtos/createOrderDto';
 
 // ENTITIES
 import Order from '../entities/order.entity';
+
+interface CreateOrder {
+	customer: Customer;
+	products: Array<{
+		product_id: string;
+		price: number;
+		quantity: number;
+	}>;
+}
 
 @EntityRepository(Order)
 class OrdersRepository extends Repository<Order> {
@@ -26,7 +36,7 @@ class OrdersRepository extends Repository<Order> {
 		return order;
 	}
 
-	public async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
+	public async createOrder(createOrderDto: CreateOrder): Promise<Order> {
 		const order = this.orderRepository.create({
 			customer: createOrderDto.customer,
 			order_products: createOrderDto.products,

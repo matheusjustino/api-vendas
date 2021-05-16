@@ -30,6 +30,12 @@ class OrdersProducts {
 	@JoinColumn({ name: 'product_id' })
 	public product: Product;
 
+	@Column({ type: String })
+	public order_id: string;
+
+	@Column({ type: String })
+	public product_id: string;
+
 	@CreateDateColumn({ type: Date })
 	public created_at: Date;
 
