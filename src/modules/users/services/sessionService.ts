@@ -1,20 +1,23 @@
-import AppError from '@shared/errors/AppError';
-import authConfig from '@config/auth';
+import { injectable, inject } from 'tsyringe';
 import { sign } from 'jsonwebtoken';
 import { compare } from 'bcryptjs';
-import { getCustomRepository } from 'typeorm';
 import { classToClass } from 'class-transformer';
+import AppError from '@shared/errors/AppError';
+
+// INTERFACES
 import CreateSessionResponseInterface from '../interfaces/createSessionResponseInterface';
-import UserRepository from '../typeorm/repositories/userRepository';
-import CreateSessionDto from '../dtos/createSessionDto';
 import CreateTokenPayload from '../interfaces/createTokenPayload';
+import { IUserRepository } from '../domain/repositories/IUserRepository';
 
+// DTO'S
+import CreateSessionDto from '../dtos/createSessionDto';
+
+@injectable()
 class SessionService {
-	private userRepository: UserRepository;
-
-	constructor() {
-		this.userRepository = getCustomRepository(UserRepository);
-	}
+	constructor(
+		@inject('UserRepository')
+		private readonly userRepository: IUserRepository,
+	) {}
 
 	public async createSession(
 		createSessionDto: CreateSessionDto,

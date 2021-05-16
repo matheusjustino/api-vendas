@@ -1,7 +1,8 @@
-import User from '../typeorm/entities/user.entity';
+import { IUser } from '../domain/models/IUser';
+import User from '../infra/typeorm/entities/user.entity';
 
 interface CreateSessionResponseInterface {
-	user: User;
+	user: IUser;
 	token: string;
 }
 

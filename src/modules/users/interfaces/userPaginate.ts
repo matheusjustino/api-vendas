@@ -1,4 +1,4 @@
-import User from '../typeorm/entities/user.entity';
+import User from '../infra/typeorm/entities/user.entity';
 
 export default interface UserPaginate {
 	from: number;

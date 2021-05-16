@@ -1,34 +1,28 @@
 import AppError from '@shared/errors/AppError';
-import { getCustomRepository } from 'typeorm';
-
-// REPOSITORIES
-import CustomerRepository from '../typeorm/repositores/customerRepository';
-
-// ENTITIES
-import Customer from '../typeorm/entities/customer.entity';
+import { injectable, inject } from 'tsyringe';
 
 // DTO'S
-import CreateCustomerDto from '../dtos/createCustomerDto';
 import UpdateCustomerDto from '../dtos/updateCustomerDto';
 
 // INTERFACES
 import CustomerPaginate from '../interfaces/customerPaginate';
+import { ICustomerRepository } from '../domain/repositories/ICustomerRepository';
+import { ICreateCustomer } from '../domain/models/ICreateCustomer';
+import { ICustomer } from '../domain/models/ICustomer';
 
+@injectable()
 class CustomerService {
-	private customerRepository: CustomerRepository;
-
-	constructor() {
-		this.customerRepository = getCustomRepository(CustomerRepository);
-	}
+	constructor(
+		@inject('CustomerRepository')
+		private readonly customerRepository: ICustomerRepository,
+	) {}
 
 	public async createCustomer(
-		createCustomerDto: CreateCustomerDto,
-	): Promise<Customer> {
-		const customerEntity = this.customerRepository.create(
+		createCustomerDto: ICreateCustomer,
+	): Promise<ICustomer> {
+		const customerEntity = await this.customerRepository.create(
 			createCustomerDto,
 		);
-
-		await this.customerRepository.save(customerEntity);
 
 		return customerEntity;
 	}
@@ -41,7 +35,7 @@ class CustomerService {
 		return customers as CustomerPaginate;
 	}
 
-	public async findById(customerId: string): Promise<Customer> {
+	public async findById(customerId: string): Promise<ICustomer> {
 		const customer = await this.customerRepository.findById(customerId);
 
 		if (!customer) {
@@ -51,7 +45,7 @@ class CustomerService {
 		return customer;
 	}
 
-	public async findByEmail(email: string): Promise<Customer> {
+	public async findByEmail(email: string): Promise<ICustomer> {
 		const customer = await this.customerRepository.findByEmail(email);
 
 		if (!customer) {
@@ -64,19 +58,17 @@ class CustomerService {
 	public async updateCustomer(
 		customerId: string,
 		updateCustomerDto: UpdateCustomerDto,
-	): Promise<Customer> {
+	): Promise<ICustomer> {
 		const customer = await this.customerRepository.findById(customerId);
 
 		if (!customer) {
 			throw new AppError('Customer not found');
 		}
 
-		const updatedCustomer = this.customerRepository.create({
+		const updatedCustomer = await this.customerRepository.create({
 			...customer,
 			...updateCustomerDto,
 		});
-
-		await this.customerRepository.save(updatedCustomer);
 
 		return updatedCustomer;
 	}

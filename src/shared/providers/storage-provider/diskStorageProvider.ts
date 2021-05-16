@@ -4,7 +4,6 @@ import multer from '@config/multer';
 
 class DiskStorageProvider {
 	public async saveFile(file: string): Promise<string> {
-		console.log('file: ', file);
 		await fs.promises.rename(
 			path.resolve(multer.tempFolder, file),
 			path.resolve(multer.directory, file),

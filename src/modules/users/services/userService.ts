@@ -1,34 +1,30 @@
-import AppError from '@shared/errors/AppError';
-import { getCustomRepository } from 'typeorm';
+import { injectable, inject } from 'tsyringe';
 import { hash, compare } from 'bcryptjs';
+import AppError from '@shared/errors/AppError';
 
 // PROVIDERS
 import StorageProvider from '@shared/providers/storage-provider/storageProvider';
 
-// REPOSITORES
-import UserRepository from '../typeorm/repositories/userRepository';
-
-// DTO's
-import UpdateUserAvatarDto from '../dtos/updateUserAvatarDto';
-import CreateUserDto from '../dtos/createUserDto';
-import UpdateUserDto from '../dtos/updateUserDto';
-
-// ENTITIES
-import User from '../typeorm/entities/user.entity';
-
 // INTERFACES
 import UserPaginate from '../interfaces/userPaginate';
+import { IUser } from '../domain/models/IUser';
+import { ICreateUser } from '../domain/models/ICreateUser';
+import { IUpdateUser } from './../domain/models/IUpdateUser';
+import { IUpdateUserAvatar } from '../domain/models/IUpdateUserAvatar';
+import { IUserRepository } from '../domain/repositories/IUserRepository';
 
+@injectable()
 class UserService {
-	private userRepository: UserRepository;
 	private storageProvider: StorageProvider;
 
-	constructor() {
-		this.userRepository = getCustomRepository(UserRepository);
+	constructor(
+		@inject('UserRepository')
+		private readonly userRepository: IUserRepository,
+	) {
 		this.storageProvider = new StorageProvider();
 	}
 
-	public async createUser(createUserDto: CreateUserDto): Promise<User> {
+	public async createUser(createUserDto: ICreateUser): Promise<IUser> {
 		const createUserData = {
 			name: createUserDto.name,
 			email: createUserDto.email,
@@ -36,10 +32,9 @@ class UserService {
 			avatar: createUserDto.avatar,
 		};
 
-		const userEntity = this.userRepository.create(createUserData);
-		await this.userRepository.save(userEntity);
+		const user = await this.userRepository.create(createUserData);
 
-		return userEntity;
+		return user;
 	}
 
 	public async findAllUsers(): Promise<UserPaginate> {
@@ -48,7 +43,7 @@ class UserService {
 		return users as UserPaginate;
 	}
 
-	public async findUserById(userId: string): Promise<User> {
+	public async findUserById(userId: string): Promise<IUser> {
 		const user = await this.userRepository.findById(userId);
 
 		if (!user) {
@@ -59,10 +54,10 @@ class UserService {
 	}
 
 	public async updateUserAvatar(
-		updateUserAvatarDto: UpdateUserAvatarDto,
-	): Promise<User> {
+		updateUserAvatar: IUpdateUserAvatar,
+	): Promise<IUser> {
 		const user = await this.userRepository.findById(
-			updateUserAvatarDto.userId,
+			updateUserAvatar.userId,
 		);
 
 		if (!user) {
@@ -76,7 +71,7 @@ class UserService {
 		}
 
 		const filename = await this.storageProvider.getStorageProvider.saveFile(
-			updateUserAvatarDto.userAvatarFileName,
+			updateUserAvatar.userAvatarFileName,
 		);
 
 		user.avatar = filename;
@@ -88,8 +83,8 @@ class UserService {
 
 	public async updateUser(
 		userId: string,
-		updateUserDto: UpdateUserDto,
-	): Promise<User> {
+		updateUserDto: IUpdateUser,
+	): Promise<IUser> {
 		const user = await this.userRepository.findById(userId);
 
 		if (!user) {
@@ -113,12 +108,10 @@ class UserService {
 			updateUserDto.password = await hash(updateUserDto.password, 10);
 		}
 
-		const updatedUserEntity = this.userRepository.create({
+		const updatedUser = await this.userRepository.save({
 			...user,
 			...updateUserDto,
 		});
-
-		const updatedUser = await this.userRepository.save(updatedUserEntity);
 
 		return updatedUser;
 	}

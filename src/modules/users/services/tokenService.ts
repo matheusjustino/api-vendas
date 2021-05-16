@@ -1,23 +1,24 @@
-import { getCustomRepository } from 'typeorm';
+import { injectable, inject } from 'tsyringe';
 import { isAfter, addHours } from 'date-fns';
 import path from 'path';
 import { hash } from 'bcryptjs';
-import UserRepository from '../typeorm/repositories/userRepository';
-import UserTokensRepository from '../typeorm/repositories/userTokensRepository';
+
 import AppError from '@shared/errors/AppError';
 import EtherealMail from '@config/mail/etherealMail';
 
-// DTO's
-import ResetPasswordDto from '../dtos/resetPasswordDto';
+// INTERFACES
+import { IUserRepository } from '../domain/repositories/IUserRepository';
+import { IUserTokensRepository } from '../domain/repositories/IUserTokensRepository';
+import { IResetPassword } from '../domain/models/IResetPassword';
 
+@injectable()
 class TokenService {
-	private userTokensRepository: UserTokensRepository;
-	private userRepository: UserRepository;
-
-	constructor() {
-		this.userTokensRepository = getCustomRepository(UserTokensRepository);
-		this.userRepository = getCustomRepository(UserRepository);
-	}
+	constructor(
+		@inject('UserRepository')
+		private readonly userRepository: IUserRepository,
+		@inject('UserTokensRepository')
+		private readonly userTokensRepository: IUserTokensRepository,
+	) {}
 
 	public async sendForgotPasswordEmail(email: string): Promise<void> {
 		const userExists = await this.userRepository.findByEmail(email);
@@ -62,7 +63,7 @@ class TokenService {
 	}
 
 	public async resetPassword(
-		resetPasswordDto: ResetPasswordDto,
+		resetPasswordDto: IResetPassword,
 	): Promise<void> {
 		const userToken = await this.userTokensRepository.findByToken(
 			resetPasswordDto.token,

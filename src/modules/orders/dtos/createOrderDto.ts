@@ -1,5 +1,3 @@
-import Customer from '@modules/customers/typeorm/entities/customer.entity';
-
 class CreateOrderDto {
 	public customer_id: string;
 

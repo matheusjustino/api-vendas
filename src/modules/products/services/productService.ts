@@ -1,40 +1,36 @@
-import { getCustomRepository } from 'typeorm';
+import { injectable, inject } from 'tsyringe';
 import AppError from '@shared/errors/AppError';
 import RedisCache from '@shared/cache/redisCache';
 
-// DTO's
-import CreateProductDto from '../dtos/createProductDto';
-import UpdateProductDto from '../dtos/updateProductDto';
-
-// REPOSITORIES
-import ProductRepository from '../typeorm/repositories/productsRepository';
-
-// ENTITIES
-import Product from '../typeorm/entities/product.entity';
-
 // INTERFACES
 import ProductPaginate from '../interfaces/productPaginate';
+import { ICreateProduct } from '../domain/models/ICreateProduct';
+import { IProduct } from '../domain/models/IProduct';
+import { IUpdateProduct } from '../domain/models/IUpdateProduct';
+import { IProductRepository } from '../domain/repositories/IProductRepository';
 
+@injectable()
 class ProductService {
-	private productsRepository: ProductRepository;
 	private redisCache: typeof RedisCache;
 
-	constructor() {
-		this.productsRepository = getCustomRepository(ProductRepository);
+	constructor(
+		@inject('ProductRepository')
+		private readonly productsRepository: IProductRepository,
+	) {
 		this.redisCache = RedisCache;
 	}
 	public async createProduct({
 		name,
 		price,
 		quantity,
-	}: CreateProductDto): Promise<Product> {
+	}: ICreateProduct): Promise<IProduct> {
 		const productExists = await this.productsRepository.findByName(name);
 
 		if (productExists) {
 			throw new AppError('There is already one product with this name');
 		}
 
-		const product = this.productsRepository.create({
+		const product = await this.productsRepository.create({
 			name,
 			price,
 			quantity,
@@ -43,13 +39,11 @@ class ProductService {
 		// invalidando cache antes adicionar novos produtos ao banco
 		await this.redisCache.invalidate('api-vendas-PRODUCT_LIST');
 
-		await this.productsRepository.save(product);
-
 		return product;
 	}
 
-	public async findAllProducts(): Promise<Product[]> {
-		let products = await this.redisCache.recover<Product[]>(
+	public async findAllProducts(): Promise<IProduct[]> {
+		let products = await this.redisCache.recover<IProduct[]>(
 			'api-vendas-PRODUCT_LIST',
 		);
 
@@ -62,8 +56,8 @@ class ProductService {
 		return products;
 	}
 
-	public async findById(productId: string): Promise<Product> {
-		const product = await this.productsRepository.findOne(productId);
+	public async findById(productId: string): Promise<IProduct> {
+		const product = await this.productsRepository.findById(productId);
 
 		if (!product) {
 			throw new AppError('Product not found');
@@ -74,9 +68,9 @@ class ProductService {
 
 	public async updateProduct(
 		productId: string,
-		updateProductDto: UpdateProductDto,
+		updateProductDto: IUpdateProduct,
 	) {
-		const product = await this.productsRepository.findOne(productId);
+		const product = await this.productsRepository.findById(productId);
 
 		if (!product) {
 			throw new AppError('Product not found');
@@ -105,8 +99,8 @@ class ProductService {
 		return updatedProduct;
 	}
 
-	public async removeProduct(productId: string): Promise<Product> {
-		const product = await this.productsRepository.findOne(productId);
+	public async removeProduct(productId: string): Promise<IProduct> {
+		const product = await this.productsRepository.findById(productId);
 
 		if (!product) {
 			throw new AppError('Product not found');
@@ -115,9 +109,9 @@ class ProductService {
 		// invalidando cache antes remover um produto do banco
 		await this.redisCache.invalidate('api-vendas-PRODUCT_LIST');
 
-		const productRemoved = await this.productsRepository.remove(product);
+		await this.productsRepository.remove(product);
 
-		return productRemoved;
+		return product;
 	}
 }
 

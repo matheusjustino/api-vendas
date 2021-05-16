@@ -5,7 +5,6 @@ class RedisCache {
 	private client: RedisClient;
 
 	constructor() {
-		console.log('client redis: ', this.client);
 		if (!this.client) {
 			this.client = new Redis(CacheConfig.config.redis);
 		}

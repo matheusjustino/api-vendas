@@ -1,4 +1,4 @@
-import Customer from '../typeorm/entities/customer.entity';
+import Customer from '../infra/typeorm/entities/customer.entity';
 
 export default interface CustomerPaginate {
 	from: number;

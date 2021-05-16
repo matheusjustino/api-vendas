@@ -1,26 +1,29 @@
-import { getCustomRepository } from 'typeorm';
+import { injectable, inject } from 'tsyringe';
 import AppError from '@shared/errors/AppError';
-
-// REPOSITORIES
-import OrdersRepository from '../typeorm/repositories/ordersRepository';
-import CustomerRepository from '@modules/customers/typeorm/repositores/customerRepository';
-import ProductRepository from '@modules/products/typeorm/repositories/productsRepository';
+import RedisCache from '@shared/cache/redisCache';
 
 // DTO'S
 import CreateOrderDto from '../dtos/createOrderDto';
 
 // INTERFACES
 import OrderPaginate from '../interfaces/orderPaginate';
+import { IOrderRepository } from '../domain/repositories/IOrderRepository';
+import { ICustomerRepository } from '@modules/customers/domain/repositories/ICustomerRepository';
+import { IProductRepository } from '@modules/products/domain/repositories/IProductRepository';
 
+@injectable()
 class OrderService {
-	private ordersRepository: OrdersRepository;
-	private customerRepository: CustomerRepository;
-	private productRepository: ProductRepository;
+	private redisCache: typeof RedisCache;
 
-	constructor() {
-		this.ordersRepository = getCustomRepository(OrdersRepository);
-		this.customerRepository = getCustomRepository(CustomerRepository);
-		this.productRepository = getCustomRepository(ProductRepository);
+	constructor(
+		@inject('OrderRepository')
+		private readonly ordersRepository: IOrderRepository,
+		@inject('CustomerRepository')
+		private readonly customerRepository: ICustomerRepository,
+		@inject('ProductRepository')
+		private readonly productRepository: IProductRepository,
+	) {
+		this.redisCache = RedisCache;
 	}
 
 	public async createOrder(createOrderDto: CreateOrderDto) {
@@ -94,13 +97,16 @@ class OrderService {
 			};
 		});
 
+		// invalidando cache antes atualizar um produto do banco
+		await this.redisCache.invalidate('api-vendas-PRODUCT_LIST');
+
 		// atualiza a quantidade dos produtos no banco
-		await this.productRepository.save(updatedProductQuantity);
+		await this.productRepository.save(updatedProductQuantity as any);
 
 		return order;
 	}
 
-	public async findAllOrders() {
+	public async findAllOrders(): Promise<OrderPaginate> {
 		const orders = await this.ordersRepository
 			.createQueryBuilder()
 			.paginate();

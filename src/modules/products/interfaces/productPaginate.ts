@@ -1,4 +1,4 @@
-import Product from '../typeorm/entities/product.entity';
+import Product from '../infra/typeorm/entities/product.entity';
 
 export default interface ProductPaginate {
 	from: number;

@@ -1,4 +1,4 @@
-import Order from '../typeorm/entities/order.entity';
+import Order from '../infra/typeorm/entities/order.entity';
 
 export default interface OrderPaginate {
 	from: number;
