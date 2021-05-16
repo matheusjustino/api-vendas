@@ -22,6 +22,7 @@ yarn build
 
 # Observações
 Necessário ter Redis, Redis Client e Postgres rodando em docker.
+Redis Client: Acessar http://localhost:8001/ para visualizar.
 ```
 
 ## Tecnologias Utilizadas
