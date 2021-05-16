@@ -1,6 +1,5 @@
 import { injectable, inject } from 'tsyringe';
 import { sign } from 'jsonwebtoken';
-import { compare } from 'bcryptjs';
 import { classToClass } from 'class-transformer';
 import AppError from '@shared/errors/AppError';
 
@@ -8,6 +7,7 @@ import AppError from '@shared/errors/AppError';
 import { ICreateSessionResponseInterface } from '../domain/models/ICreateSessionResponseInterface';
 import { ICreateTokenPayload } from '../domain/models/ICreateTokenPayload';
 import { IUserRepository } from '../domain/repositories/IUserRepository';
+import { IHashProvider } from '../providers/hashProvider/models/IHashprovider';
 
 // DTO'S
 import CreateSessionDto from '../dtos/createSessionDto';
@@ -17,6 +17,8 @@ class SessionService {
 	constructor(
 		@inject('UserRepository')
 		private readonly userRepository: IUserRepository,
+		@inject('HashProvider')
+		private readonly hashProvider: IHashProvider,
 	) {}
 
 	public async createSession(
@@ -30,7 +32,7 @@ class SessionService {
 			throw new AppError('Incorrect email/password', 401);
 		}
 
-		const validPassword = await compare(
+		const validPassword = await this.hashProvider.compareHash(
 			createSessionDto.password,
 			user.password,
 		);

@@ -12,6 +12,7 @@ import routes from './routes';
 import AppError from '@shared/errors/AppError';
 import multerConfig from '@config/multer';
 import rateLimiter from '@shared/infra/http/middlewares/rateLimiter';
+import LogRoutes from './middlewares/logRoutes';
 
 async function main() {
 	const connection = await createConnection();
@@ -24,7 +25,8 @@ async function main() {
 		app.use(express.json());
 		app.use(rateLimiter);
 		app.use(pagination);
-		app.use('/files', express.static(multerConfig.directory));
+		app.use(LogRoutes),
+			app.use('/files', express.static(multerConfig.directory));
 		app.use(routes);
 		app.use(errors());
 		app.use(

@@ -1,5 +1,4 @@
 import { injectable, inject } from 'tsyringe';
-import { hash, compare } from 'bcryptjs';
 import AppError from '@shared/errors/AppError';
 
 // PROVIDERS
@@ -12,6 +11,7 @@ import { ICreateUser } from '../domain/models/ICreateUser';
 import { IUpdateUser } from './../domain/models/IUpdateUser';
 import { IUpdateUserAvatar } from '../domain/models/IUpdateUserAvatar';
 import { IUserRepository } from '../domain/repositories/IUserRepository';
+import { IHashProvider } from '../providers/hashProvider/models/IHashprovider';
 
 @injectable()
 class UserService {
@@ -20,6 +20,8 @@ class UserService {
 	constructor(
 		@inject('UserRepository')
 		private readonly userRepository: IUserRepository,
+		@inject('HashProvider')
+		private readonly hashProvider: IHashProvider,
 	) {
 		this.storageProvider = new StorageProvider();
 	}
@@ -96,7 +98,7 @@ class UserService {
 		}
 
 		if (updateUserDto.password && updateUserDto.oldPassword) {
-			const checkOldPassword = await compare(
+			const checkOldPassword = await this.hashProvider.compareHash(
 				updateUserDto.oldPassword,
 				user.password,
 			);
@@ -105,7 +107,9 @@ class UserService {
 				throw new AppError('Old password does not match');
 			}
 
-			updateUserDto.password = await hash(updateUserDto.password, 10);
+			updateUserDto.password = await this.hashProvider.generateHash(
+				updateUserDto.password,
+			);
 		}
 
 		const updatedUser = await this.userRepository.save({
@@ -117,7 +121,7 @@ class UserService {
 	}
 
 	private async encryptPassword(password: string): Promise<string> {
-		const hashedPassword = await hash(password, 10);
+		const hashedPassword = await this.hashProvider.generateHash(password);
 
 		return hashedPassword;
 	}

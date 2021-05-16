@@ -1,7 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { isAfter, addHours } from 'date-fns';
 import path from 'path';
-import { hash } from 'bcryptjs';
 
 import AppError from '@shared/errors/AppError';
 import EtherealMail from '@config/mail/etherealMail';
@@ -10,6 +9,7 @@ import EtherealMail from '@config/mail/etherealMail';
 import { IUserRepository } from '../domain/repositories/IUserRepository';
 import { IUserTokensRepository } from '../domain/repositories/IUserTokensRepository';
 import { IResetPassword } from '../domain/models/IResetPassword';
+import { IHashProvider } from '../providers/hashProvider/models/IHashprovider';
 
 @injectable()
 class TokenService {
@@ -18,6 +18,8 @@ class TokenService {
 		private readonly userRepository: IUserRepository,
 		@inject('UserTokensRepository')
 		private readonly userTokensRepository: IUserTokensRepository,
+		@inject('HashProvider')
+		private readonly hashProvider: IHashProvider,
 	) {}
 
 	public async sendForgotPasswordEmail(email: string): Promise<void> {
@@ -88,7 +90,9 @@ class TokenService {
 			throw new AppError('Token expired');
 		}
 
-		userExists.password = await hash(resetPasswordDto.password, 10);
+		userExists.password = await this.hashProvider.generateHash(
+			resetPasswordDto.password,
+		);
 
 		await this.userRepository.save(userExists);
 	}

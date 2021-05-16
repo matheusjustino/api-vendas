@@ -1,5 +1,7 @@
 import { container } from 'tsyringe';
 
+import '@modules/users/providers';
+
 // REPOSITORIES
 import CustomerRepository from '@modules/customers/infra/typeorm/repositores/customerRepository';
 import OrderRepository from '@modules/orders/infra/typeorm/repositories/ordersRepository';
