@@ -18,7 +18,7 @@ yarn dev
 yarn build
 
 # Observações
-Necessário ter Redis e Postgres rodando em docker.
+Necessário ter Redis, Redis Client e Postgres rodando em docker.
 ```
 
 ## Tecnologias Utilizadas
