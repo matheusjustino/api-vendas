@@ -3,7 +3,6 @@ import AppError from '@shared/errors/AppError';
 import RedisCache from '@shared/cache/redisCache';
 
 // INTERFACES
-import ProductPaginate from '../interfaces/productPaginate';
 import { ICreateProduct } from '../domain/models/ICreateProduct';
 import { IProduct } from '../domain/models/IProduct';
 import { IUpdateProduct } from '../domain/models/IUpdateProduct';

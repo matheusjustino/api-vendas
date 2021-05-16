@@ -5,8 +5,8 @@ import { classToClass } from 'class-transformer';
 import AppError from '@shared/errors/AppError';
 
 // INTERFACES
-import CreateSessionResponseInterface from '../interfaces/createSessionResponseInterface';
-import CreateTokenPayload from '../interfaces/createTokenPayload';
+import { ICreateSessionResponseInterface } from '../domain/models/ICreateSessionResponseInterface';
+import { ICreateTokenPayload } from '../domain/models/ICreateTokenPayload';
 import { IUserRepository } from '../domain/repositories/IUserRepository';
 
 // DTO'S
@@ -21,7 +21,7 @@ class SessionService {
 
 	public async createSession(
 		createSessionDto: CreateSessionDto,
-	): Promise<CreateSessionResponseInterface> {
+	): Promise<ICreateSessionResponseInterface> {
 		const user = await this.userRepository.findByEmail(
 			createSessionDto.email,
 		);
@@ -39,13 +39,13 @@ class SessionService {
 			throw new AppError('Incorrect email/password', 401);
 		}
 
-		const payload: CreateTokenPayload = {
+		const payload: ICreateTokenPayload = {
 			userId: user.id,
 			email: user.email,
 		};
 		const token = this.createToken(payload, user.id);
 
-		const response: CreateSessionResponseInterface = {
+		const response: ICreateSessionResponseInterface = {
 			user,
 			token,
 		};
@@ -55,7 +55,7 @@ class SessionService {
 		return response;
 	}
 
-	private createToken(payload: CreateTokenPayload, subject: string) {
+	private createToken(payload: ICreateTokenPayload, subject: string) {
 		try {
 			const token = sign(payload, process.env.SECRET, {
 				subject,

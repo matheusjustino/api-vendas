@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 import AppError from '@shared/errors/AppError';
-import TokenPayload from '@modules/users/interfaces/tokenPayload';
+import { ITokenPayload } from '@modules/users/domain/models/ITokenPayload';
 
 export default function isAuthenticated(
 	request: Request,
@@ -17,7 +17,7 @@ export default function isAuthenticated(
 	const [, token] = authHeader.split(' ');
 
 	try {
-		const decodedToken = verify(token, process.env.SECRET) as TokenPayload;
+		const decodedToken = verify(token, process.env.SECRET) as ITokenPayload;
 
 		request.user = {
 			userId: decodedToken.userId,

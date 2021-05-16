@@ -6,7 +6,7 @@ import AppError from '@shared/errors/AppError';
 import StorageProvider from '@shared/providers/storage-provider/storageProvider';
 
 // INTERFACES
-import UserPaginate from '../interfaces/userPaginate';
+import { IUserPaginate } from '../domain/models/IUserPaginate';
 import { IUser } from '../domain/models/IUser';
 import { ICreateUser } from '../domain/models/ICreateUser';
 import { IUpdateUser } from './../domain/models/IUpdateUser';
@@ -37,10 +37,10 @@ class UserService {
 		return user;
 	}
 
-	public async findAllUsers(): Promise<UserPaginate> {
+	public async findAllUsers(): Promise<IUserPaginate> {
 		const users = await this.userRepository.createQueryBuilder().paginate();
 
-		return users as UserPaginate;
+		return users as IUserPaginate;
 	}
 
 	public async findUserById(userId: string): Promise<IUser> {

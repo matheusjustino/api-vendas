@@ -1,6 +1,6 @@
-import Product from '../infra/typeorm/entities/product.entity';
+import Product from '../../infra/typeorm/entities/product.entity';
 
-export default interface ProductPaginate {
+export interface IProductPaginate {
 	from: number;
 	to: number;
 	per_page: number;
