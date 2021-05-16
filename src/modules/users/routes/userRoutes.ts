@@ -13,7 +13,7 @@ import isAuthenticated from '@shared/http/middlewares/isAuthenticated';
 
 const userRouter = Router();
 const userController = UserController;
-const multerUpload = multer(multerConfig);
+const multerUpload = multer(multerConfig.multer);
 
 userRouter.post(
 	'/',

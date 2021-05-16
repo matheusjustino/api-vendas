@@ -1,10 +1,9 @@
 import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
 import { hash, compare } from 'bcryptjs';
-import path from 'path';
-import fs from 'fs';
 
-import multerConfig from '@config/multer';
+// PROVIDERS
+import StorageProvider from '@shared/providers/storage-provider/storageProvider';
 
 // REPOSITORES
 import UserRepository from '../typeorm/repositories/userRepository';
@@ -22,9 +21,11 @@ import UserPaginate from '../interfaces/userPaginate';
 
 class UserService {
 	private userRepository: UserRepository;
+	private storageProvider: StorageProvider;
 
 	constructor() {
 		this.userRepository = getCustomRepository(UserRepository);
+		this.storageProvider = new StorageProvider();
 	}
 
 	public async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -69,21 +70,16 @@ class UserService {
 		}
 
 		if (user.avatar) {
-			const userAvatarFilePath = path.join(
-				multerConfig.directory,
+			await this.storageProvider.getStorageProvider.deleteFile(
 				user.avatar,
 			);
-
-			const userAvatarFileExists = await fs.promises.stat(
-				userAvatarFilePath,
-			);
-
-			if (userAvatarFileExists) {
-				await fs.promises.unlink(userAvatarFilePath);
-			}
 		}
 
-		user.avatar = updateUserAvatarDto.userAvatarFileName;
+		const filename = await this.storageProvider.getStorageProvider.saveFile(
+			updateUserAvatarDto.userAvatarFileName,
+		);
+
+		user.avatar = filename;
 
 		await this.userRepository.save(user);
 

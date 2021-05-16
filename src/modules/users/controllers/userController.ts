@@ -59,6 +59,7 @@ class UserController {
 				userAvatarFileName: request.file.filename,
 			};
 
+			console.log('request file: ', request.file);
 			const userService = new UserService();
 
 			const user = await userService.updateUserAvatar(
@@ -67,6 +68,7 @@ class UserController {
 
 			return response.json(classToClass(user));
 		} catch (error) {
+			console.log(error);
 			return response.json(error);
 		}
 	}

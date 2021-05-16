@@ -10,6 +10,10 @@ declare namespace NodeJS {
 			REDIS_HOST: string;
 			REDIS_PORT: string;
 			REDIS_PASS: string;
+			S3_BUCKET: string;
+			S3_REGION: string;
+			S3_ACCESS_KEY: string;
+			S3_PRIVATE_KEY: string;
 		};
 	}
 }

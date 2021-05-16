@@ -17,11 +17,11 @@ import ProductPaginate from '../interfaces/productPaginate';
 
 class ProductService {
 	private productsRepository: ProductRepository;
-	private redisCache: RedisCache;
+	private redisCache: typeof RedisCache;
 
 	constructor() {
 		this.productsRepository = getCustomRepository(ProductRepository);
-		this.redisCache = new RedisCache();
+		this.redisCache = RedisCache;
 	}
 	public async createProduct({
 		name,

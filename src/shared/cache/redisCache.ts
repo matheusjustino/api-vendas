@@ -5,7 +5,10 @@ class RedisCache {
 	private client: RedisClient;
 
 	constructor() {
-		this.client = new Redis(CacheConfig.config.redis);
+		console.log('client redis: ', this.client);
+		if (!this.client) {
+			this.client = new Redis(CacheConfig.config.redis);
+		}
 	}
 
 	public async save(key: string, value: any): Promise<void> {
@@ -28,4 +31,6 @@ class RedisCache {
 	}
 }
 
-export default RedisCache;
+const redisCache = new RedisCache();
+
+export default redisCache;
