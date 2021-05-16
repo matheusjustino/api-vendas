@@ -14,6 +14,9 @@ yarn
 # Iniciar no modo Desenvolvimento
 yarn dev
 
+# Iniciar no modo Produção
+yarn prod
+
 # Build
 yarn build
 
