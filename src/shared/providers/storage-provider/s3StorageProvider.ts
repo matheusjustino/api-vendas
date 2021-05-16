@@ -29,7 +29,7 @@ class S3StorageProvider {
 
 		await this.s3Client
 			.putObject({
-				Bucket: multer.config.aws.bucket,
+				Bucket: process.env.S3_BUCKET,
 				Key: file,
 				ACL: 'public-read',
 				Body: fileContent,
@@ -45,7 +45,7 @@ class S3StorageProvider {
 	public async deleteFile(file: string): Promise<void> {
 		await this.s3Client
 			.deleteObject({
-				Bucket: multer.config.aws.bucket,
+				Bucket: process.env.S3_BUCKET,
 				Key: file,
 			})
 			.promise();

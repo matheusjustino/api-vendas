@@ -18,10 +18,7 @@ export default function isAuthenticated(
 	const [bearer, token] = authHeader.split(' ');
 
 	try {
-		const decodedToken = verify(
-			token,
-			authConfig.jwt.secret,
-		) as TokenPayload;
+		const decodedToken = verify(token, process.env.SECRET) as TokenPayload;
 
 		request.user = {
 			userId: decodedToken.userId,

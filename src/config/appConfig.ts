@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 const environments = ['develop', 'production'];
 const config =
@@ -6,7 +6,7 @@ const config =
 		? `${process.env.NODE_ENV}.env`
 		: 'develop.env';
 
-const configPath = join(process.cwd(), '/src/environments', config);
+const configPath = join(resolve(__dirname, '..', 'environments'), config);
 
 export const configOptions = {
 	envFilePath: configPath,

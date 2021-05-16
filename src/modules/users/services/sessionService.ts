@@ -53,12 +53,17 @@ class SessionService {
 	}
 
 	private createToken(payload: CreateTokenPayload, subject: string) {
-		const token = sign(payload, authConfig.jwt.secret, {
-			subject,
-			expiresIn: authConfig.jwt.expiresIn,
-		});
+		try {
+			const token = sign(payload, process.env.SECRET, {
+				subject,
+				expiresIn: process.env.EXPIRES_IN,
+			});
 
-		return token;
+			return token;
+		} catch (error) {
+			console.log(error);
+			throw new AppError(error);
+		}
 	}
 }
 
